@@ -1,0 +1,19 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\open_cygwin]
+@="Open Cygwin Here"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\open_cygwin\command]
+@="C:\\cygwin64\\bin\\mintty.exe -i /Cygwin-Terminal.ico -e /bin/bash.exe -l -c \"cd '%V'; exec /bin/bash.exe\""
+
+[HKEY_CLASSES_ROOT\Directory\shell\open_cygwin]
+@="Open Cygwin Here"
+
+[HKEY_CLASSES_ROOT\Directory\shell\open_cygwin\command]
+@="C:\\cygwin64\\bin\\mintty.exe -i /Cygwin-Terminal.ico -e /bin/bash.exe -l -c \"cd '%V'; exec /bin/bash.exe\""
+
+[HKEY_CLASSES_ROOT\LibraryFolder\Background\shell\open_cygwin]
+@="Open Cygwin Here"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\Background\shell\open_cygwin\command]
+@="C:\\cygwin64\\bin\\mintty.exe -i /Cygwin-Terminal.ico -e /bin/bash.exe -l -c \"cd '%V'; exec /bin/bash.exe\""

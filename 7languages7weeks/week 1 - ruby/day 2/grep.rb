@@ -1,0 +1,1 @@
+IO.readlines("grep.txt").each{|l| puts l if l=~/42/}
