@@ -29,8 +29,8 @@ Resources:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Action: 's3:*'
-                Resource: '*'
+                Action: 's3:GetObject'
+                Resource: !Join [ "", [ "arn:aws:s3:::", !ImportValue BucketNameRecipesFree, "/*" ]]
 
   InstanceProfileRole:
     Type: AWS::IAM::InstanceProfile
@@ -48,20 +48,10 @@ Resources:
       - IpProtocol: -1
         CidrIp: 0.0.0.0/0
       SecurityGroupIngress:
-      - IpProtocol: -1
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
         FromPort: 5000
         ToPort: 5000
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: 0.0.0.0/0
+        SourceSecurityGroupId: !Ref AppLoadBalancerSG
       VpcId: !ImportValue VpcId
 
   RecipeWebServiceInstance:
@@ -85,7 +75,7 @@ Resources:
               echo "Environment=S3_FREE_RECIPES="${S3FreeRecipies} | sudo tee -a /lib/systemd/system/flask.service
               echo "Environment=S3_SECRET_RECIPES="${S3SecretRecipies} | sudo tee -a /lib/systemd/system/flask.service
               systemctl daemon-reload
-              sleep 30
+              sleep 31
               service flask restart
             - S3FreeRecipies: !ImportValue BucketNameRecipesFree
               S3SecretRecipies: !ImportValue BucketNameRecipesSecret
@@ -97,7 +87,7 @@ Resources:
       GroupDescription: "Security group for this application server"
       SecurityGroupEgress:
       - IpProtocol: -1
-        CidrIp: 0.0.0.0/0
+        CidrIp: 127.0.0.1/32
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 80
@@ -105,10 +95,14 @@ Resources:
         CidrIp: 0.0.0.0/0
       VpcId: !ImportValue VpcId
 
-  AppEIP:
-    Type: AWS::EC2::EIP
+  AppLoadBalancerSGEgress:
+    Type: AWS::EC2::SecurityGroupEgress
     Properties:
-      InstanceId: !Ref RecipeWebServiceInstance
+      GroupId: !Ref AppLoadBalancerSG
+      IpProtocol: tcp
+      FromPort: 5000
+      ToPort: 5000
+      DestinationSecurityGroupId: !Ref WebAppSG
 
   AppLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -144,7 +138,5 @@ Resources:
       - Id: !Ref RecipeWebServiceInstance
 
 Outputs:
-  ApplicationInstanceIP:
-    Value: !GetAtt RecipeWebServiceInstance.PublicDnsName
   ApplicationURL:
     Value: !GetAtt AppLoadBalancer.DNSName
