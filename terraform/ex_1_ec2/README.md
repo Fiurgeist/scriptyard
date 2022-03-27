@@ -1,0 +1,1 @@
+Managing several EC2 instances of different types.

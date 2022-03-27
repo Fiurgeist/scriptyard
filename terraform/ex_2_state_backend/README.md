@@ -1,0 +1,1 @@
+Same as ex_1 but with a S3 bucket as backend for terraform state management.
